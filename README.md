@@ -4,10 +4,10 @@ Make your GameMaker game stand out with Rich Presence!
 # Setup
 
   ## Get the Thing
-	 Download the latest [release](https://github.com/sam-k0/GMRPC-legacy/releases/tag/default) here.
+ Download the latest [release](https://github.com/sam-k0/GMRPC-legacy/releases/tag/default) here.
 	
  ## Import the gmz in GameMaker
-		Extensions -> Import (Drag and Drop onto the GMS window *may* work too)
+Extensions -> Import (Drag and Drop onto the GMS window *may* work too)
  ## Use it in code
 		
 
