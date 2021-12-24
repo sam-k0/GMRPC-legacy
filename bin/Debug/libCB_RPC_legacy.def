@@ -1,0 +1,5 @@
+EXPORTS
+    gmrpc_clear @1
+    gmrpc_exit @2
+    gmrpc_init @3
+    gmrpc_setPresence @4

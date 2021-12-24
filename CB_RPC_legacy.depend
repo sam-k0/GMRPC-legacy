@@ -1,0 +1,44 @@
+# depslib dependency file v1.0
+1640353095 source:e:\visualstudio\projects\cb_rpc_legacy\main.cpp
+	<windows.h>
+	<stdio.h>
+	<stdint.h>
+	<stdio.h>
+	<string.h>
+	<time.h>
+	<iostream>
+	"utf_conv.h"
+	"gms.h"
+	"discord-files/discord_rpc.h"
+	<stdint.h>
+	<stdio.h>
+	<string.h>
+	<time.h>
+	"gms.h"
+	"discord-files/discord_rpc.h"
+
+1640340760 e:\visualstudio\projects\cb_rpc_legacy\discord-files\discord_rpc.h
+	<stdint.h>
+
+1640343972 source:e:\visualstudio\projects\cb_rpc_legacy\dllmain.cpp
+	<stdio.h>
+	<stdint.h>
+	<stdio.h>
+	<string.h>
+	<time.h>
+	<iostream>
+	"gms.h"
+	"discord-files/discord_rpc.h"
+
+1640353575 e:\visualstudio\projects\cb_rpc_legacy\gms.h
+	<string>
+	<string.h>
+	<iostream>
+
+1640350508 e:\visualstudio\projects\cb_rpc_legacy\utf_conv.h
+	<windows.h>
+	<string>
+	<locale>
+	<codecvt>
+	<string.h>
+
