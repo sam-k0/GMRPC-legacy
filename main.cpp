@@ -15,6 +15,7 @@ using namespace std;
 
 /* DLL global variables */
 static const char* APPLICATION_ID = "345229890980937739";
+bool initialized = false;
 /***
  Discord Callbacks
 ***/
@@ -58,6 +59,119 @@ static void handleDiscordJoinRequest(const DiscordUser* request)
 
 
 /* Discord Functions */
+
+static void discordInit()
+{
+    DiscordEventHandlers handlers;
+    memset(&handlers, 0, sizeof(handlers));
+    handlers.ready = handleDiscordReady;
+    handlers.disconnected = handleDiscordDisconnected;
+    handlers.errored = handleDiscordError;
+    handlers.joinGame = handleDiscordJoin;
+    handlers.spectateGame = handleDiscordSpectate;
+    handlers.joinRequest = handleDiscordJoinRequest;
+    Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
+    
+    // Set initialized to true
+    initialized = true;
+}
+
+/** DLL Exposed functions */
+
+/**
+* @param appid The app id of the app
+* @brief This is the first function to be called. Initializes the rpc dll 
+*/
+gmx gmbool gmrpc_init(const char* appid)
+{
+    APPLICATION_ID = appid;
+    discordInit();
+    std::cout << "Initialized presence to App "<< appid <<endl;
+    return gmtrue;
+}
+
+/**
+* @param state The state to display
+* @param details The details to display
+* @param largeKey The image to show (large)
+* @param smallKey The image to show (small)
+* @brief This changes the presence of displayed info
+*/
+gmx gmbool gmrpc_setPresence(stringToDLL state, stringToDLL details, stringToDLL largeKey, stringToDLL smallKey)
+{
+    if(!initialized) // Check if initialized rpc
+    {
+        gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
+        return gmfalse;
+    }
+
+    char statebuf[256];
+    char detbuf[256];
+    char smallBuf[256];
+    char largeBuf[256];
+    // Get RPC
+    DiscordRichPresence discordPresence;
+    memset(&discordPresence, 0, sizeof(discordPresence));
+    /// Set state
+    string tempState = gmu::constcharptr_to_string(state);
+    sprintf(statebuf, "%s", gmu::string_to_charptr(tempState));
+    discordPresence.state = statebuf;
+
+    /// Set Details
+    string tempDetails = gmu::constcharptr_to_string(details);
+    sprintf(detbuf, "%s", gmu::string_to_charptr(tempDetails));
+    discordPresence.details = detbuf;
+
+     // Set small image
+    string tempSmall = gmu::constcharptr_to_string(smallKey);
+    sprintf(smallBuf, "%s", gmu::string_to_charptr(tempSmall));
+    discordPresence.smallImageKey = smallBuf;
+
+    // Set large image
+    string tempLarge = gmu::constcharptr_to_string(largeKey);
+    sprintf(largeBuf, "%s", gmu::string_to_charptr(tempLarge));
+    discordPresence.largeImageKey = largeBuf;
+
+    // Finish
+    discordPresence.instance = 0;
+    Discord_UpdatePresence(&discordPresence);
+    Discord_RunCallbacks();
+
+    cout << "Updated Presence to "<<tempState << " / "<< tempDetails<<endl;
+    return gmtrue;
+}
+
+/**
+* @brief Exits and frees the dll
+*/
+gmx gmbool gmrpc_exit()
+{
+    if(!initialized) // Check if initialized rpc
+    {
+        gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
+        return gmfalse;
+    }
+    std::cout << "Exiting GMRPC"<<endl;
+    Discord_Shutdown();
+    return gmtrue;
+}
+
+/**
+* @brief Reset presence
+*/
+gmx gmbool gmrpc_clear()
+{
+    if(!initialized) // Check if initialized rpc
+    {
+        gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
+        return gmfalse;
+    }
+    Discord_ClearPresence();
+    std::cout << "Clearing Presence"<<endl;
+    return gmtrue;
+}
+
+/*<!--- Unused ----> */
 /*
 static void updateDiscordPresence()
 {
@@ -110,84 +224,7 @@ static void updateDiscordPresence()
 */
 
 
-static void discordInit()
-{
-    DiscordEventHandlers handlers;
-    memset(&handlers, 0, sizeof(handlers));
-    handlers.ready = handleDiscordReady;
-    handlers.disconnected = handleDiscordDisconnected;
-    handlers.errored = handleDiscordError;
-    handlers.joinGame = handleDiscordJoin;
-    handlers.spectateGame = handleDiscordSpectate;
-    handlers.joinRequest = handleDiscordJoinRequest;
-    Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
-}
-
-/** DLL Exposed functions */
-
-gmx gmbool gmrpc_init(const char* appid)
-{
-    APPLICATION_ID = appid;
-    discordInit();
-    std::cout << "Initialized presence to App "<< appid <<endl;
-    return gmtrue;
-}
-
-
-gmx gmbool gmrpc_setPresence(stringToDLL state, stringToDLL details, stringToDLL largeKey, stringToDLL smallKey)
-{
-    char statebuf[256];
-    char detbuf[256];
-    char smallBuf[256];
-    char largeBuf[256];
-    // Get RPC
-    DiscordRichPresence discordPresence;
-    memset(&discordPresence, 0, sizeof(discordPresence));
-    /// Set state
-    string tempState = gmu::constcharptr_to_string(state);
-    sprintf(statebuf, "%s", gmu::string_to_charptr(tempState));
-    discordPresence.state = statebuf;
-
-    /// Set Details
-    string tempDetails = gmu::constcharptr_to_string(details);
-    sprintf(detbuf, "%s", gmu::string_to_charptr(tempDetails));
-    discordPresence.details = detbuf;
-
-     // Set small image
-    string tempSmall = gmu::constcharptr_to_string(smallKey);
-    sprintf(smallBuf, "%s", gmu::string_to_charptr(tempSmall));
-    discordPresence.smallImageKey = smallBuf;
-
-    // Set large image
-    string tempLarge = gmu::constcharptr_to_string(largeKey);
-    sprintf(largeBuf, "%s", gmu::string_to_charptr(tempLarge));
-    discordPresence.largeImageKey = largeBuf;
-
-    // Finish
-    discordPresence.instance = 0;
-    Discord_UpdatePresence(&discordPresence);
-    Discord_RunCallbacks();
-
-    cout << "Updated Presence to "<<tempState << " / "<< tempDetails<<endl;
-    return gmtrue;
-}
-
-
-gmx gmbool gmrpc_exit(stringToDLL appid)
-{
-    std::cout << "Exiting GMRPC"<<endl;
-    Discord_Shutdown();
-    return gmtrue;
-}
-
-gmx gmbool gmrpc_clear()
-{
-    Discord_ClearPresence();
-    std::cout << "Clearing Presence"<<endl;
-    return gmtrue;
-}
-
-
+/** Example from official discord repo **/
 
 /*
 #include <stdint.h>
