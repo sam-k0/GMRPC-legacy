@@ -1,6 +1,8 @@
 # GMRPC-legacy
 Make your GameMaker game stand out with Rich Presence!
-
+# Features
+- Show your game's name on the player's discord profile
+- Set custom text and images to show
 # Setup
 
   ## Get the Thing
@@ -27,7 +29,9 @@ Extensions -> Import (Drag and Drop onto the GMS window *may* work too)
 
 ## Free the DLL
 Make sure to exit Discord if you don't need it anymore.
-		 This will unload the "discord-rpc.dll" from memory.
+- To do this, call gmrpc_exit()
+
+	This will unload the "discord-rpc.dll" from memory.
 
  
 				
