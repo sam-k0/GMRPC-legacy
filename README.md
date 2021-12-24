@@ -1,12 +1,9 @@
 # GMRPC-legacy
 Make your GameMaker game stand out with Rich Presence!
-# Features 
-- Show your game's name on the user's discord profile
-- Set State, Details and Images
-- *Timestamp support is yet to be added*
+
 # Setup
 
-  ## Get the thing
+  ## Get the Thing
  Download the latest [release](https://github.com/sam-k0/GMRPC-legacy/releases/tag/default) here.
 	
  ## Import the gmz in GameMaker
@@ -33,3 +30,7 @@ Make sure to exit Discord if you don't need it anymore.
 		 This will unload the "discord-rpc.dll" from memory.
 
  
+				
+			
+		 
+
