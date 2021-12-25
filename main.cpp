@@ -7,7 +7,6 @@
 #include <time.h>
 #include <iostream>
 
-#include "utf_conv.h"
 #include "gms.h"
 #include "discord-files/discord_rpc.h"
 
