@@ -7,6 +7,12 @@
 #include <time.h>
 #include <iostream>
 
+#include <string>
+#include <locale>
+#include <codecvt>
+
+
+#include "gmrpc.h"
 #include "gms.h"
 #include "discord-files/discord_rpc.h"
 
@@ -15,6 +21,7 @@ using namespace std;
 /* DLL global variables */
 static const char* APPLICATION_ID = "345229890980937739";
 bool initialized = false;
+DiscordUser* localUser;
 /***
  Discord Callbacks
 ***/
@@ -70,7 +77,7 @@ static void discordInit()
     handlers.spectateGame = handleDiscordSpectate;
     handlers.joinRequest = handleDiscordJoinRequest;
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
-    
+
     // Set initialized to true
     initialized = true;
 }
@@ -79,7 +86,7 @@ static void discordInit()
 
 /**
 * @param appid The app id of the app
-* @brief This is the first function to be called. Initializes the rpc dll 
+* @brief This is the first function to be called. Initializes the rpc dll
 */
 gmx gmbool gmrpc_init(const char* appid)
 {
@@ -170,6 +177,39 @@ gmx gmbool gmrpc_clear()
     return gmtrue;
 }
 
+/// User management
+/*
+gmx stringFromDLL gmrpc_user_getUsername()
+{
+    if(!initialized) // Check if initialized rpc
+    {
+        gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
+        return "";
+    }
+
+    // try converting
+    try{
+        cout << localUser->username << endl;
+       //return gmu::string_to_charptr(localUser->username);
+       return "Amogus";
+    }
+    catch(std::logic_error &e)
+    {
+
+        cout << "Could not fetch username! "<< e.what()<< endl;
+        return "GMRPC_ERR_USERNAME";
+    }
+
+}*/
+
+
+/**
+* @brief This is to check the connection to the dll. Does nothing really.
+*/
+gmx gmint gmrpc_checkConnection(gmint n)
+{
+    return n*2;
+}
 /*<!--- Unused ----> */
 /*
 static void updateDiscordPresence()

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1640353095 source:e:\visualstudio\projects\cb_rpc_legacy\main.cpp
+1640537766 source:e:\visualstudio\projects\cb_rpc_legacy\main.cpp
 	<windows.h>
 	<stdio.h>
 	<stdint.h>
@@ -7,7 +7,10 @@
 	<string.h>
 	<time.h>
 	<iostream>
-	"utf_conv.h"
+	<string>
+	<locale>
+	<codecvt>
+	"gmrpc.h"
 	"gms.h"
 	"discord-files/discord_rpc.h"
 	<stdint.h>
@@ -30,7 +33,7 @@
 	"gms.h"
 	"discord-files/discord_rpc.h"
 
-1640353575 e:\visualstudio\projects\cb_rpc_legacy\gms.h
+1640535796 e:\visualstudio\projects\cb_rpc_legacy\gms.h
 	<string>
 	<string.h>
 	<iostream>
@@ -41,4 +44,7 @@
 	<locale>
 	<codecvt>
 	<string.h>
+
+1640537621 e:\visualstudio\projects\cb_rpc_legacy\gmrpc.h
+	<string>
 

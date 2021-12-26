@@ -1,5 +1,6 @@
 EXPORTS
-    gmrpc_clear @1
-    gmrpc_exit @2
-    gmrpc_init @3
-    gmrpc_setPresence @4
+    gmrpc_checkConnection @1
+    gmrpc_clear @2
+    gmrpc_exit @3
+    gmrpc_init @4
+    gmrpc_setPresence @5

@@ -36,7 +36,7 @@
 #define GMS_H_INCLUDED
 
 /* Define extern export for GameMaker */
-#define gmx extern "C" __declspec(dllexport) 
+#define gmx extern "C" __declspec(dllexport)
 
 /* Define GameMaker Booleans */
 #define gmtrue 1.0;
@@ -63,7 +63,7 @@ class gmu {
 public:
 
     /**
-    * @param s String to convert to char* 
+    * @param s String to convert to char*
     * @brief Convert string to char*
     */
 	static char* string_to_charptr(string s)
@@ -71,8 +71,9 @@ public:
 		return _strdup(s.c_str());
 	}
 
+
     /**
-    * @param s String to convert to const char* 
+    * @param s String to convert to const char*
     * @brief Convert string to const char*
     */
 	static const char* string_to_constcharptr(string s)
