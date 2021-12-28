@@ -21,7 +21,9 @@ using namespace std;
 /* DLL global variables */
 static const char* APPLICATION_ID = "345229890980937739";
 bool initialized = false;
-DiscordUser* localUser;
+int64_t endTime = -1; // Since epoch
+int64_t startTime = -1; // Since epoch
+
 /***
  Discord Callbacks
 ***/
@@ -56,7 +58,6 @@ static void handleDiscordSpectate(const char* secret)
 
 static void handleDiscordJoinRequest(const DiscordUser* request)
 {
-    int response = -1;
     printf("\nDiscord: join request from %s#%s - %s\n",
            request->username,
            request->discriminator,
@@ -97,6 +98,26 @@ gmx gmbool gmrpc_init(const char* appid)
 }
 
 /**
+* @brief Sets the start timestamp (Time since epoch)
+* @param passedTime The timestamp
+*/
+gmx gmbool gmrpc_setStarttime(gmint passedTime)
+{
+    startTime = int64_t(passedTime);
+    return gmtrue;
+}
+
+/**
+* @brief Sets the end timestamp (Time since epoch)
+* @param passedTime The timestamp
+*/
+gmx gmbool gmrpc_setEndtime(gmint passedTime)
+{
+    endTime = int64_t(passedTime);
+    return gmtrue;
+}
+
+/**
 * @param state The state to display
 * @param details The details to display
 * @param largeKey The image to show (large)
@@ -128,17 +149,30 @@ gmx gmbool gmrpc_setPresence(stringToDLL state, stringToDLL details, stringToDLL
     sprintf(detbuf, "%s", gmu::string_to_charptr(tempDetails));
     discordPresence.details = detbuf;
 
-     // Set small image
+    /// Set small image
     string tempSmall = gmu::constcharptr_to_string(smallKey);
     sprintf(smallBuf, "%s", gmu::string_to_charptr(tempSmall));
     discordPresence.smallImageKey = smallBuf;
 
-    // Set large image
+    /// Set large image
     string tempLarge = gmu::constcharptr_to_string(largeKey);
     sprintf(largeBuf, "%s", gmu::string_to_charptr(tempLarge));
     discordPresence.largeImageKey = largeBuf;
 
-    // Finish
+    /// Add timestamps if set
+    if(startTime != -1)
+    {
+        discordPresence.startTimestamp = startTime;
+    }
+    else if(endTime  != -1)
+    {
+        discordPresence.endTimestamp = endTime;
+    }
+    // Reset timestamps
+    startTime = -1;
+    endTime = -1;
+
+    /// Finish and call update
     discordPresence.instance = 0;
     Discord_UpdatePresence(&discordPresence);
     Discord_RunCallbacks();
@@ -176,6 +210,8 @@ gmx gmbool gmrpc_clear()
     std::cout << "Clearing Presence"<<endl;
     return gmtrue;
 }
+
+
 
 /// User management
 /*

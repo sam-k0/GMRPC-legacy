@@ -3,4 +3,6 @@ EXPORTS
     gmrpc_clear @2
     gmrpc_exit @3
     gmrpc_init @4
-    gmrpc_setPresence @5
+    gmrpc_setEndtime @5
+    gmrpc_setPresence @6
+    gmrpc_setStarttime @7
