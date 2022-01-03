@@ -1,8 +1,11 @@
 # GMRPC-legacy
 Make your GameMaker game stand out with Rich Presence!
+*DOCUMENTATION HERE:* [click](https://github.com/sam-k0/GMRPC-legacy/wiki/GMRPC-functions)
+
 # Features
 - Show your game's name on the player's discord profile
 - Set custom text and images to show
+- Set timestamps
 # Setup
 
   ## Get the Thing
