@@ -6,6 +6,7 @@ Make your GameMaker game stand out with Rich Presence!
 - Show your game's name on the player's discord profile
 - Set custom text and images to show
 - Set timestamps
+- Get the local discord user's (public) information
 # Setup
 
   ## Get the Thing
