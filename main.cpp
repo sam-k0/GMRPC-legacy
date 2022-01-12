@@ -30,9 +30,22 @@ const int EVENT_OTHER_SOCIAL = 70;
 // defines function pointers for the DS map creation
 void (*CreateAsynEventWithDSMap)(int, int) = NULL;
 int (*CreateDsMap)(int _num, ...) = NULL;
-bool (*DsMapAddDouble)(int _index, char* _pKey, double value) = NULL;
-bool (*DsMapAddString)(int _index, char* _pKey, char* pVal) = NULL;
+bool (*DsMapAddDouble)(int _index, const char* _pKey, double value) = NULL;
+bool (*DsMapAddString)(int _index, const char* _pKey, const char* pVal) = NULL;
 
+// Reg cb - Do not touch
+gmx void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4) {
+    void (*CreateAsynEventWithDSMapPtr)(int, int) = (void (*)(int, int))(arg1);
+    int(*CreateDsMapPtr)(int _num, ...) = (int(*)(int _num, ...)) (arg2);
+    CreateAsynEventWithDSMap = CreateAsynEventWithDSMapPtr;
+    CreateDsMap = CreateDsMapPtr;
+
+    bool (*DsMapAddDoublePtr)(int _index, const char* _pKey, double value) = (bool(*)(int,  const char*, double))(arg3);
+    bool (*DsMapAddStringPtr)(int _index, const char* _pKey, const char* pVal) = (bool(*)(int, const char*, const char*))(arg4);
+
+    DsMapAddDouble = DsMapAddDoublePtr;
+    DsMapAddString = DsMapAddStringPtr;
+}
 
 /***
  Discord Callbacks
@@ -47,12 +60,12 @@ static void handleDiscordReady(const DiscordUser* connectedUser)
 
     // Try to return the discord stuff
     int themap = CreateDsMap(0);
-    DsMapAddString(ds_map, "event_type", "GMRPC_READY");
-    DsMapAddString(ds_map, "user_id", request->userId);
-    DsMapAddString(ds_map, "username", request->username);
-    DsMapAddString(ds_map, "discriminator", request->discriminator);
-    DsMapAddString(ds_map, "avatar", request->avatar);
-    CreateAsynEventWithDSMap(ds_map, EVENT_OTHER_SOCIAL);
+    DsMapAddString(themap, "event_type", "GMRPC_READY");
+    DsMapAddString(themap, "user_id", connectedUser->userId);
+    DsMapAddString(themap, "username", connectedUser->username);
+    DsMapAddString(themap, "discriminator", connectedUser->discriminator);
+    DsMapAddString(themap, "avatar", connectedUser->avatar);
+    CreateAsynEventWithDSMap(themap, EVENT_OTHER_SOCIAL);
 }
 
 static void handleDiscordDisconnected(int errcode, const char* message)
@@ -104,21 +117,6 @@ static void discordInit()
 
 /** DLL Exposed functions */
 
-
-
-// Reg cb - Do not touch
-gmx void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4) {
-    void (*CreateAsynEventWithDSMapPtr)(int, int) = (void (*)(int, int))(arg1);
-    int(*CreateDsMapPtr)(int _num, ...) = (int(*)(int _num, ...)) (arg2);
-    CreateAsynEventWithDSMap = CreateAsynEventWithDSMapPtr;
-    CreateDsMap = CreateDsMapPtr;
-
-    bool (*DsMapAddDoublePtr)(int _index, char* _pKey, double value) = (bool(*)(int, char*, double))(arg3);
-    bool (*DsMapAddStringPtr)(int _index, char* _pKey, char* pVal) = (bool(*)(int, char*, char*))(arg4);
-
-    DsMapAddDouble = DsMapAddDoublePtr;
-    DsMapAddString = DsMapAddStringPtr;
-}
 
 /**
 * @param appid The app id of the app
