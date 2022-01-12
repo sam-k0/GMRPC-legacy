@@ -1,5 +1,9 @@
 EXPORTS
-    gmrpc_clear @1
-    gmrpc_exit @2
-    gmrpc_init @3
-    gmrpc_setPresence @4
+    RegisterCallbacks @1
+    gmrpc_checkConnection @2
+    gmrpc_clear @3
+    gmrpc_exit @4
+    gmrpc_init @5
+    gmrpc_setEndtime @6
+    gmrpc_setPresence @7
+    gmrpc_setStarttime @8

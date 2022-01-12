@@ -44,7 +44,7 @@
 		</Linker>
 		<Unit filename="discord-files/discord_register.h" />
 		<Unit filename="discord-files/discord_rpc.h" />
-		<Unit filename="dllmain.cpp" />
+		<Unit filename="gmrpc.h" />
 		<Unit filename="gms.h" />
 		<Unit filename="main.cpp" />
 		<Extensions />

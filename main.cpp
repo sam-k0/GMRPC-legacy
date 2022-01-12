@@ -7,6 +7,12 @@
 #include <time.h>
 #include <iostream>
 
+#include <string>
+#include <locale>
+#include <codecvt>
+
+
+#include "gmrpc.h"
 #include "gms.h"
 #include "discord-files/discord_rpc.h"
 
@@ -15,6 +21,32 @@ using namespace std;
 /* DLL global variables */
 static const char* APPLICATION_ID = "345229890980937739";
 bool initialized = false;
+int64_t endTime = -1; // Since epoch
+int64_t startTime = -1; // Since epoch
+
+/* Register Callback */
+const int EVENT_OTHER_SOCIAL = 70;
+
+// defines function pointers for the DS map creation
+void (*CreateAsynEventWithDSMap)(int, int) = NULL;
+int (*CreateDsMap)(int _num, ...) = NULL;
+bool (*DsMapAddDouble)(int _index, const char* _pKey, double value) = NULL;
+bool (*DsMapAddString)(int _index, const char* _pKey, const char* pVal) = NULL;
+
+// Reg cb - Do not touch
+gmx void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4) {
+    void (*CreateAsynEventWithDSMapPtr)(int, int) = (void (*)(int, int))(arg1);
+    int(*CreateDsMapPtr)(int _num, ...) = (int(*)(int _num, ...)) (arg2);
+    CreateAsynEventWithDSMap = CreateAsynEventWithDSMapPtr;
+    CreateDsMap = CreateDsMapPtr;
+
+    bool (*DsMapAddDoublePtr)(int _index, const char* _pKey, double value) = (bool(*)(int,  const char*, double))(arg3);
+    bool (*DsMapAddStringPtr)(int _index, const char* _pKey, const char* pVal) = (bool(*)(int, const char*, const char*))(arg4);
+
+    DsMapAddDouble = DsMapAddDoublePtr;
+    DsMapAddString = DsMapAddStringPtr;
+}
+
 /***
  Discord Callbacks
 ***/
@@ -25,6 +57,15 @@ static void handleDiscordReady(const DiscordUser* connectedUser)
            connectedUser->username,
            connectedUser->discriminator,
            connectedUser->userId);
+
+    // Try to return the discord stuff
+    int themap = CreateDsMap(0);
+    DsMapAddString(themap, "event_type", "GMRPC_READY");
+    DsMapAddString(themap, "user_id", connectedUser->userId);
+    DsMapAddString(themap, "username", connectedUser->username);
+    DsMapAddString(themap, "discriminator", connectedUser->discriminator);
+    DsMapAddString(themap, "avatar", connectedUser->avatar);
+    CreateAsynEventWithDSMap(themap, EVENT_OTHER_SOCIAL);
 }
 
 static void handleDiscordDisconnected(int errcode, const char* message)
@@ -49,7 +90,6 @@ static void handleDiscordSpectate(const char* secret)
 
 static void handleDiscordJoinRequest(const DiscordUser* request)
 {
-    int response = -1;
     printf("\nDiscord: join request from %s#%s - %s\n",
            request->username,
            request->discriminator,
@@ -70,22 +110,43 @@ static void discordInit()
     handlers.spectateGame = handleDiscordSpectate;
     handlers.joinRequest = handleDiscordJoinRequest;
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
-    
+
     // Set initialized to true
     initialized = true;
 }
 
 /** DLL Exposed functions */
 
+
 /**
 * @param appid The app id of the app
-* @brief This is the first function to be called. Initializes the rpc dll 
+* @brief This is the first function to be called. Initializes the rpc dll
 */
 gmx gmbool gmrpc_init(const char* appid)
 {
     APPLICATION_ID = appid;
     discordInit();
     std::cout << "Initialized presence to App "<< appid <<endl;
+    return gmtrue;
+}
+
+/**
+* @brief Sets the start timestamp (Time since epoch)
+* @param passedTime The timestamp
+*/
+gmx gmbool gmrpc_setStarttime(gmint passedTime)
+{
+    startTime = int64_t(passedTime);
+    return gmtrue;
+}
+
+/**
+* @brief Sets the end timestamp (Time since epoch)
+* @param passedTime The timestamp
+*/
+gmx gmbool gmrpc_setEndtime(gmint passedTime)
+{
+    endTime = int64_t(passedTime);
     return gmtrue;
 }
 
@@ -121,17 +182,30 @@ gmx gmbool gmrpc_setPresence(stringToDLL state, stringToDLL details, stringToDLL
     sprintf(detbuf, "%s", gmu::string_to_charptr(tempDetails));
     discordPresence.details = detbuf;
 
-     // Set small image
+    /// Set small image
     string tempSmall = gmu::constcharptr_to_string(smallKey);
     sprintf(smallBuf, "%s", gmu::string_to_charptr(tempSmall));
     discordPresence.smallImageKey = smallBuf;
 
-    // Set large image
+    /// Set large image
     string tempLarge = gmu::constcharptr_to_string(largeKey);
     sprintf(largeBuf, "%s", gmu::string_to_charptr(tempLarge));
     discordPresence.largeImageKey = largeBuf;
 
-    // Finish
+    /// Add timestamps if set
+    if(startTime != -1)
+    {
+        discordPresence.startTimestamp = startTime;
+    }
+    else if(endTime  != -1)
+    {
+        discordPresence.endTimestamp = endTime;
+    }
+    // Reset timestamps
+    startTime = -1;
+    endTime = -1;
+
+    /// Finish and call update
     discordPresence.instance = 0;
     Discord_UpdatePresence(&discordPresence);
     Discord_RunCallbacks();
@@ -149,8 +223,10 @@ gmx gmbool gmrpc_exit()
     {
         gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
         return gmfalse;
+
     }
     std::cout << "Exiting GMRPC"<<endl;
+    initialized = false;
     Discord_Shutdown();
     return gmtrue;
 }
@@ -170,6 +246,41 @@ gmx gmbool gmrpc_clear()
     return gmtrue;
 }
 
+
+
+/// User management
+/*
+gmx stringFromDLL gmrpc_user_getUsername()
+{
+    if(!initialized) // Check if initialized rpc
+    {
+        gmu::debugmessage("GMRPC is not initialized! Please call gmrpc_init(...) first");
+        return "";
+    }
+
+    // try converting
+    try{
+        cout << localUser->username << endl;
+       //return gmu::string_to_charptr(localUser->username);
+       return "Amogus";
+    }
+    catch(std::logic_error &e)
+    {
+
+        cout << "Could not fetch username! "<< e.what()<< endl;
+        return "GMRPC_ERR_USERNAME";
+    }
+
+}*/
+
+
+/**
+* @brief This is to check the connection to the dll. Does nothing really.
+*/
+gmx gmint gmrpc_checkConnection(gmint n)
+{
+    return n*2;
+}
 /*<!--- Unused ----> */
 /*
 static void updateDiscordPresence()
