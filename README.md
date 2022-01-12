@@ -13,7 +13,7 @@ Up-to-date builds can be found in bin/Debug*
 # Setup
 
   ## Get the Thing
- Download the latest [release](https://github.com/sam-k0/GMRPC-legacy/releases/tag/default) here.
+ Download the latest [release](https://github.com/sam-k0/GMRPC-legacy/releases/) here.
 	
  ## Import the gmz in GameMaker
 Extensions -> Import (Drag and Drop onto the GMS window *may* work too)
