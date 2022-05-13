@@ -16,6 +16,8 @@
 #include "gms.h"
 #include "discord-files/discord_rpc.h"
 
+//#define compileforgamemaker 1
+
 using namespace std;
 
 /* DLL global variables */
@@ -24,6 +26,7 @@ bool initialized = false;
 int64_t endTime = -1; // Since epoch
 int64_t startTime = -1; // Since epoch
 
+#ifdef compileforgamemaker
 /* Register Callback */
 const int EVENT_OTHER_SOCIAL = 70;
 
@@ -46,6 +49,7 @@ gmx void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4) {
     DsMapAddDouble = DsMapAddDoublePtr;
     DsMapAddString = DsMapAddStringPtr;
 }
+#endif // compileforgamemaker
 
 /***
  Discord Callbacks
@@ -59,6 +63,7 @@ static void handleDiscordReady(const DiscordUser* connectedUser)
            connectedUser->userId);
 
     // Try to return the discord stuff
+    #ifdef compileforgamemaker
     int themap = CreateDsMap(0);
     DsMapAddString(themap, "event_type", "GMRPC_READY");
     DsMapAddString(themap, "user_id", connectedUser->userId);
@@ -66,6 +71,7 @@ static void handleDiscordReady(const DiscordUser* connectedUser)
     DsMapAddString(themap, "discriminator", connectedUser->discriminator);
     DsMapAddString(themap, "avatar", connectedUser->avatar);
     CreateAsynEventWithDSMap(themap, EVENT_OTHER_SOCIAL);
+    #endif // compileforgamemaker
 }
 
 static void handleDiscordDisconnected(int errcode, const char* message)
@@ -95,6 +101,7 @@ static void handleDiscordJoinRequest(const DiscordUser* request)
            request->discriminator,
            request->userId);
 }
+
 
 
 /* Discord Functions */
@@ -245,7 +252,6 @@ gmx gmbool gmrpc_clear()
     std::cout << "Clearing Presence"<<endl;
     return gmtrue;
 }
-
 
 
 /// User management
